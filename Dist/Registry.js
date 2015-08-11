@@ -202,7 +202,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 var _this3 = this;
 
                 Object.keys(itemMap).forEach(function (name) {
-                    return _this3.register(classMap[name], name);
+                    return _this3.register(itemMap[name], name);
                 });
 
                 return this;

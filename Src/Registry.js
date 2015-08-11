@@ -117,7 +117,7 @@ function factory (global, factoryOpts) {
          * @param {Object} itemMap
          */
         registerAll(itemMap) {
-            Object.keys(itemMap).forEach((name) => this.register(classMap[name], name));
+            Object.keys(itemMap).forEach((name) => this.register(itemMap[name], name));
 
             return this;
         }

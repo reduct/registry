@@ -4,7 +4,7 @@ var Registry = require('../../Dist/Registry.js');
 var chai = buildTools.chai;
 var expect = chai.expect;
 
-describe('@reduct/registry: The "Registry"', function () {
+describe('@reduct/registry: The "Registry"', function suite () {
 
     /**
      * A primitive value.
@@ -82,6 +82,27 @@ describe('@reduct/registry: The "Registry"', function () {
         expect(function registerPrimitiveWithoutAlias () {
             registry.register(anAnonymousFunction);
         }).to.throw('@reduct/registry Error: Could not guess name of registered item. Please specify an explicit alias.');
+
+        done();
+    });
+
+    it('should register multiple items at once', function test (done) {
+        var registry = new Registry();
+        registry.registerAll({
+            'a': 'aaa',
+            'b': 'bbb',
+            'c': 'ccc'
+        });
+
+        expect(Object.keys(registry.items).length).to.equal(3);
+
+        expect(Object.keys(registry.items)[0]).to.equal('a');
+        expect(Object.keys(registry.items)[1]).to.equal('b');
+        expect(Object.keys(registry.items)[2]).to.equal('c');
+
+        expect(registry.get('a')).to.equal('aaa');
+        expect(registry.get('b')).to.equal('bbb');
+        expect(registry.get('c')).to.equal('ccc');
 
         done();
     });
