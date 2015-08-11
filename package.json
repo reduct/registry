@@ -1,0 +1,45 @@
+{
+  "name": "@reduct/registry",
+  "version": "1.0.0",
+  "description": "Defines a set of objects and exposes methods to operate on that ",
+  "main": "Dist/Registry.js",
+  "scripts": {
+    "test": "reduct",
+    "reduct": "reduct"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/reduct/registry.git"
+  },
+  "author": "reduct",
+  "contributors": [
+    {
+      "name": "Tyll Weiß",
+      "email": "inkdpixels@gmail.com",
+      "url": "https://github.com/Inkdpixels/"
+    },
+    {
+      "name": "André König",
+      "email": "andre.koenig@posteo.de",
+      "url": "https://github.com/akoenig/"
+    },
+    {
+      "name": "Wilhelm Behncke",
+      "url": "https://github.com/grebaldi"
+    }
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/reduct/registry/issues"
+  },
+  "homepage": "https://github.com/reduct/registry",
+  "devDependencies": {
+    "@reduct/build-tools": "^1.4.5"
+  },
+  "reduct": {
+    "sourceFolder": "Src/",
+    "distributionFolder": "Dist/",
+    "entryFile": "Registry.js",
+    "globalPackageName": "registry"
+  }
+}
