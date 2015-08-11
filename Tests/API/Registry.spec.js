@@ -48,7 +48,7 @@ describe('@reduct/registry: The "Registry"', function () {
         done();
     });
 
-    it('should register an object an make it available via its name', function test (done) {
+    it('should register a function and make it available via its name', function test (done) {
         var registry = new Registry();
         registry.register(aNamedFunction);
 
@@ -59,4 +59,17 @@ describe('@reduct/registry: The "Registry"', function () {
 
         done();
     });
+
+    it('should register a primitive and make it available via a given alias', function test (done) {
+        var registry = new Registry();
+        registry.register(justSomePrimitiveValue, 'someAlias');
+
+        expect(Object.keys(registry.items).length).to.equal(1);
+        expect(Object.keys(registry.items)[0]).to.equal('someAlias');
+
+        expect(registry.get('someAlias')).to.equal(justSomePrimitiveValue);
+
+        done();
+    });
+
 });
