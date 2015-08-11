@@ -2,7 +2,12 @@ var buildTools = require('@reduct/build-tools');
 var Registry = require('../../Dist/Registry.js');
 
 var chai = buildTools.chai;
+var spies = buildTools.spies;
+
+chai.use(spies);
+
 var expect = chai.expect;
+
 
 describe('@reduct/registry: The "Registry"', function suite () {
 
@@ -106,5 +111,47 @@ describe('@reduct/registry: The "Registry"', function suite () {
 
         done();
     });
+
+    it('should should inform listeners as soon as a requested item is registered', function test (done) {
+        var registry = new Registry();
+        var afterSomeKeyHasBeenRegistered = chai.spy();
+
+        registry.await('someKey').then(afterSomeKeyHasBeenRegistered).then(function assert () {
+            expect(afterSomeKeyHasBeenRegistered).to.have.been.called.once;
+            expect(afterSomeKeyHasBeenRegistered).to.have.been.called.with('someValue');
+
+            done();
+        });
+
+        expect(Object.keys(registry.deferred).length).to.equal(1);
+
+        registry.register('someValue', 'someKey');
+    });
+
+    it('should should inform listeners as soon as a requested item is registered within a given timeframe', function test (done) {
+        var registry = new Registry();
+        var afterSomeKeyHasBeenRegistered = chai.spy();
+        var afterTimeoutOccurred = chai.spy();
+
+        registry.expect('someKey', 22).then(afterSomeKeyHasBeenRegistered).then(function assert () {
+            expect(afterSomeKeyHasBeenRegistered).to.have.been.called.once;
+            expect(afterSomeKeyHasBeenRegistered).to.have.been.called.with('someValue');
+
+            expect(afterTimeoutOccurred).to.have.been.called.once;
+            expect(afterTimeoutOccurred).to.have.been.called.with('@reduct/registry Error: Timeout occured while waiting for someOtherKey.');
+
+            done();
+        });
+
+        registry.expect('someOtherKey', 20).catch(afterTimeoutOccurred);
+
+        expect(Object.keys(registry.deferred).length).to.equal(2);
+
+        setTimeout(function registerValues () {
+            registry.register('someValue', 'someKey');
+            registry.register('someOtherValue', 'someOtherKey');
+        }, 21);
+    });
+
 
 });

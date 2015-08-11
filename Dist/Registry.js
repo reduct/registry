@@ -138,7 +138,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     _this.deferred[key] = resolve;
 
                     if (timeout > 0) {
-                        setTimeout(reject, timeout);
+                        setTimeout(function () {
+                            return reject("@reduct/registry Error: Timeout occured while waiting for " + key + ".");
+                        }, timeout);
                     }
                 });
             }
@@ -229,11 +231,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             get: function get(key) {
                 return registry.get(key);
             },
-            expect: function expect() {
-                return registry.expect();
+            expect: function expect(key) {
+                var timeout = arguments.length <= 1 || arguments[1] === undefined ? 1000 : arguments[1];
+                return registry.expect(key, timeout);
             },
-            await: function await() {
-                return registry.await();
+            await: function await(key) {
+                return registry.await(key);
             }
         };
 

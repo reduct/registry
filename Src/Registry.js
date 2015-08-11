@@ -68,7 +68,7 @@ function factory (global, factoryOpts) {
                 this.deferred[key] = resolve;
 
                 if (timeout > 0) {
-                    setTimeout(reject, timeout);
+                    setTimeout(() => reject(`@reduct/registry Error: Timeout occured while waiting for ${key}.`), timeout);
                 }
             });
         }
@@ -137,8 +137,8 @@ function factory (global, factoryOpts) {
             register: (value, key = '') => registry.register(value, key),
             registerAll: (itemMap) => registry.registerAll(itemMap),
             get: (key) => registry.get(key),
-            expect: () => registry.expect(),
-            await: () => registry.await()
+            expect: (key, timeout = 1000) => registry.expect(key, timeout),
+            await: (key) => registry.await(key)
         };
 
         //
