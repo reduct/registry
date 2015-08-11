@@ -9,12 +9,12 @@ With npm, use the familiar syntax e.g.:
 npm install @reduct/registry --save
 ```
 
-once the component package is installed, just require it in your application file.
+once the registry package is installed, just require it in your application file.
 ```js
 const registry = require('@reduct/registry');
 ```
 
-This package also supports AMD/RequireJS. Aren't using AMD or CommonJS? Just grab a [release](https://github.com/reduct/logger/releases), include the `Dist/Logger.min.js` and access the logger via the following global:
+This package also supports AMD/RequireJS. Aren't using AMD or CommonJS? Just grab a [release](https://github.com/reduct/registry/releases), include the `Dist/Registry.min.js` and access the registry via the following global:
 ```js
 const registry = window.reduct.registry;
 ```
