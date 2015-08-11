@@ -10,7 +10,7 @@ function factory (global, factoryOpts) {
      */
     function _guessNameOf (value) {
         if (Object.prototype.toString.call(value) === '[object Function]') {
-            if ('name' in value) {
+            if ('name' in value && value.name) {
                 return value.name;
             }
 

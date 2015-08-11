@@ -72,4 +72,18 @@ describe('@reduct/registry: The "Registry"', function () {
         done();
     });
 
+    it('should complain if an unnamed item is registered without an alias', function test (done) {
+        var registry = new Registry();
+
+        expect(function registerPrimitiveWithoutAlias () {
+            registry.register(justSomePrimitiveValue);
+        }).to.throw('@reduct/registry Error: Could not guess name of registered item. Please specify an explicit alias.');
+
+        expect(function registerPrimitiveWithoutAlias () {
+            registry.register(anAnonymousFunction);
+        }).to.throw('@reduct/registry Error: Could not guess name of registered item. Please specify an explicit alias.');
+
+        done();
+    });
+
 });
