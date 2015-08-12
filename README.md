@@ -21,12 +21,45 @@ const registry = window.reduct.registry;
 
 
 ## API
+#### registry.register();
+Type: `Function` <br>
+Argument `item`: `*` <br>
+Argument `alias`: `String` <br>
+Returns: `Registry` The registry itself (for enabling method chaining)
 
+Registers a single item in the registry. If no alias is provided, it tries to guess the name of the item, which basically means, that if you're passing a function, it'll use the function name as the alias. Since es2015 classes are just sugar for functions acting as constructors, this applies for classes too.
 
+#### registry.registerAll();
+Type: `Function` <br>
+Argument `itemMap`: `Object` <br>
+Returns: `Registry` The registry itself (for enabling method chaining)
+
+Registers multiple items at once. The object keys of `itemMap` will act as aliases and the values as items.
+
+#### registry.get();
+Type: `Function` <br>
+Argument `alias`: `String` <br>
+Returns: `*`
+
+Retrieves the item with the given alias from the registry. An error will be thrown, if the item doesn't exist.
+
+#### registry.await();
+Type: `Function` <br>
+Argument `alias`: `String` <br>
+Returns: `Promise`
+
+Returns a Promise that will resolve as soon as an item gets registered under the given alias.
+
+#### registry.expect();
+Type: `Function` <br>
+Argument `alias`: `String` <br>
+Argument `timeout`: `Number` <br>
+Returns: `Promise`
+
+Returns a Promise that will resolve as soon as an item gets registered under the given alias. The Promise will be rejected after `timeout` milliseconds, if until then no item got registered.
 
 ## Contributing
 In lieu of a formal styleguide, take care to maintain the existing coding style.
-
 
 ## License
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
