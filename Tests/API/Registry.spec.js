@@ -112,6 +112,16 @@ describe('@reduct/registry: The "Registry"', function suite () {
         done();
     });
 
+    it('should should complain if a requested item cannot be found', function test (done) {
+        var registry = new Registry();
+
+        expect(function callGetWithoutHavingRegisteredTheRequestedItem () {
+            registry.get('someKey');
+        }).to.throw('@reduct/registry Error: Could not find someKey.');
+
+        done();
+    });
+
     it('should should inform listeners as soon as a requested item is registered', function test (done) {
         var registry = new Registry();
         var afterSomeKeyHasBeenRegistered = chai.spy();

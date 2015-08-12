@@ -107,7 +107,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         _createClass(Registry, [{
             key: "get",
             value: function get(key) {
-                if (!key in this.items) {
+                if (!(key in this.items)) {
                     throw new Error("@reduct/registry Error: Could not find " + key + ".");
                 }
 
