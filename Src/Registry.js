@@ -51,6 +51,20 @@ function factory (global, factoryOpts) {
         }
 
         /**
+         * Returns multiple items from the registry
+         *
+         * @param {String...} keys
+         * @returns []
+         */
+        getAll(keys) {
+            let result = [];
+
+            keys.forEach((key) => result.push(this.get(key)));
+
+            return result;
+        }
+
+        /**
          * Creates and returns a promise, which will resolve into the requested
          * value identified by key as soon as it is registered or will reject, if no
          * value is registered after a given timeout
@@ -137,6 +151,7 @@ function factory (global, factoryOpts) {
             register: (value, key = '') => registry.register(value, key),
             registerAll: (itemMap) => registry.registerAll(itemMap),
             get: (key) => registry.get(key),
+            getAll: (keys) => registry.getAll(keys),
             expect: (key, timeout = 1000) => registry.expect(key, timeout),
             await: (key) => registry.await(key)
         };

@@ -44,11 +44,28 @@ describe('@reduct/registry: The "Registry"', function suite () {
         done();
     });
 
+    it('should expose methods to query the existence of multiple objects at once synchronously', function test (done) {
+        var registry = new Registry();
+
+        expect(registry.getAll).to.be.a('function');
+
+        done();
+    });
+
     it('should expose methods to query the existence of objects asynchronously', function test (done) {
         var registry = new Registry();
 
         expect(registry.expect).to.be.a('function');
         expect(registry.await).to.be.a('function');
+
+        done();
+    });
+
+    it('should expose methods to query the existence of multiple objects at once asynchronously', function test (done) {
+        var registry = new Registry();
+
+        expect(registry.expectAll).to.be.a('function');
+        expect(registry.awaitAll).to.be.a('function');
 
         done();
     });
@@ -118,6 +135,24 @@ describe('@reduct/registry: The "Registry"', function suite () {
         expect(function callGetWithoutHavingRegisteredTheRequestedItem () {
             registry.get('someKey');
         }).to.throw('@reduct/registry Error: Could not find someKey.');
+
+        done();
+    });
+
+    it('should should retrieve multiple objects at once synchronously', function test (done) {
+        var registry = new Registry();
+
+        registry.registerAll({
+            'a': 'aaa',
+            'b': 'bbb',
+            'c': 'ccc'
+        });
+
+        var result = registry.getAll(['a', 'b', 'c']);
+
+        expect(result[0]).to.equal('aaa');
+        expect(result[1]).to.equal('bbb');
+        expect(result[2]).to.equal('ccc');
 
         done();
     });
