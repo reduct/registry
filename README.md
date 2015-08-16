@@ -43,6 +43,13 @@ Returns: `*`
 
 Retrieves the item with the given alias from the registry. An error will be thrown, if the item doesn't exist.
 
+#### registry.getAll();
+Type: `Function` <br>
+Argument `aliases`: `Array` <br>
+Returns: `Array`
+
+Retrieves multiple items with the given aliases from the registry. An error will be thrown, if any of these items doesn't exist.
+
 #### registry.await();
 Type: `Function` <br>
 Argument `alias`: `String` <br>

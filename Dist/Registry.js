@@ -115,6 +115,26 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             }
 
             /**
+             * Returns multiple items from the registry
+             *
+             * @param {String...} keys
+             * @returns []
+             */
+        }, {
+            key: "getAll",
+            value: function getAll(keys) {
+                var _this = this;
+
+                var result = [];
+
+                keys.forEach(function (key) {
+                    return result.push(_this.get(key));
+                });
+
+                return result;
+            }
+
+            /**
              * Creates and returns a promise, which will resolve into the requested
              * value identified by key as soon as it is registered or will reject, if no
              * value is registered after a given timeout
@@ -126,16 +146,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
             key: "expect",
             value: function expect(key) {
-                var _this = this;
+                var _this2 = this;
 
                 var timeout = arguments.length <= 1 || arguments[1] === undefined ? 1000 : arguments[1];
 
                 return new Promise(function (resolve, reject) {
-                    if (key in _this.items) {
-                        resolve(_this.items[key]);
+                    if (key in _this2.items) {
+                        resolve(_this2.items[key]);
                     }
 
-                    _this.deferred[key] = resolve;
+                    _this2.deferred[key] = resolve;
 
                     if (timeout > 0) {
                         setTimeout(function () {
@@ -143,6 +163,27 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                         }, timeout);
                     }
                 });
+            }
+
+            /**
+             * Creates and returns a promise, which will resolve into all of the requested
+             * values identified by keys as soon as all of them are registered or will reject, if any of
+             * the values is not registered after a given timeout
+             *
+             * @param {String[]} keys
+             * @param {Number} timeout
+             * @returns {Promise}
+             */
+        }, {
+            key: "expectAll",
+            value: function expectAll(keys) {
+                var _this3 = this;
+
+                var timeout = arguments.length <= 1 || arguments[1] === undefined ? 1000 : arguments[1];
+
+                return Promise.all(keys.map(function (key) {
+                    return _this3.expect(key, timeout);
+                }));
             }
 
             /**
@@ -159,6 +200,23 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             }
 
             /**
+             * Creates and returns a promise, which will resolve into all of the requested
+             * values identified by keys as soon as all of them are registered.
+             *
+             * @param {String[]} keys
+             * @returns {Promise}
+             */
+        }, {
+            key: "awaitAll",
+            value: function awaitAll(keys) {
+                var _this4 = this;
+
+                return Promise.all(keys.map(function (key) {
+                    return _this4.await(key);
+                }));
+            }
+
+            /**
              * Registers an item
              *
              * @param {} value
@@ -168,14 +226,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
             key: "register",
             value: function register(value) {
-                var _this2 = this;
+                var _this5 = this;
 
                 var key = arguments.length <= 1 || arguments[1] === undefined ? '' : arguments[1];
 
                 // Handle batch registration
                 if (typeof value === 'object' && Object.getPrototypeOf(value) === Object.prototype) {
                     Object.keys(value).forEach(function (key) {
-                        return _this2.register(key, value);
+                        return _this5.register(key, value);
                     });
                     return;
                 }
@@ -201,10 +259,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
             key: "registerAll",
             value: function registerAll(itemMap) {
-                var _this3 = this;
+                var _this6 = this;
 
                 Object.keys(itemMap).forEach(function (name) {
-                    return _this3.register(itemMap[name], name);
+                    return _this6.register(itemMap[name], name);
                 });
 
                 return this;
@@ -231,12 +289,22 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             get: function get(key) {
                 return registry.get(key);
             },
+            getAll: function getAll(keys) {
+                return registry.getAll(keys);
+            },
             expect: function expect(key) {
                 var timeout = arguments.length <= 1 || arguments[1] === undefined ? 1000 : arguments[1];
                 return registry.expect(key, timeout);
             },
+            expectAll: function expectAll(keys) {
+                var timeout = arguments.length <= 1 || arguments[1] === undefined ? 1000 : arguments[1];
+                return registry.expectAll(keys, timeout);
+            },
             await: function await(key) {
                 return registry.await(key);
+            },
+            awaitAll: function awaitAll(keys) {
+                return registry.awaitAll(keys);
             }
         };
 

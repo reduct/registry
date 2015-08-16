@@ -51,6 +51,20 @@ function factory (global, factoryOpts) {
         }
 
         /**
+         * Returns multiple items from the registry
+         *
+         * @param {String...} keys
+         * @returns []
+         */
+        getAll(keys) {
+            let result = [];
+
+            keys.forEach((key) => result.push(this.get(key)));
+
+            return result;
+        }
+
+        /**
          * Creates and returns a promise, which will resolve into the requested
          * value identified by key as soon as it is registered or will reject, if no
          * value is registered after a given timeout
@@ -74,6 +88,19 @@ function factory (global, factoryOpts) {
         }
 
         /**
+         * Creates and returns a promise, which will resolve into all of the requested
+         * values identified by keys as soon as all of them are registered or will reject, if any of
+         * the values is not registered after a given timeout
+         *
+         * @param {String[]} keys
+         * @param {Number} timeout
+         * @returns {Promise}
+         */
+        expectAll(keys, timeout = 1000) {
+            return Promise.all(keys.map((key) => this.expect(key, timeout)));
+        }
+
+        /**
          * Creates and returns a promise, which will resolve into the requested
          * value identified by key as soon as it is registered
          *
@@ -82,6 +109,17 @@ function factory (global, factoryOpts) {
          */
         await(key) {
             return this.expect(key, 0);
+        }
+
+        /**
+         * Creates and returns a promise, which will resolve into all of the requested
+         * values identified by keys as soon as all of them are registered.
+         *
+         * @param {String[]} keys
+         * @returns {Promise}
+         */
+        awaitAll(keys) {
+            return Promise.all(keys.map((key) => this.await(key)));
         }
 
         /**
@@ -137,8 +175,11 @@ function factory (global, factoryOpts) {
             register: (value, key = '') => registry.register(value, key),
             registerAll: (itemMap) => registry.registerAll(itemMap),
             get: (key) => registry.get(key),
+            getAll: (keys) => registry.getAll(keys),
             expect: (key, timeout = 1000) => registry.expect(key, timeout),
-            await: (key) => registry.await(key)
+            expectAll: (keys, timeout = 1000) => registry.expectAll(keys, timeout),
+            await: (key) => registry.await(key),
+            awaitAll: (keys) => registry.awaitAll(keys)
         };
 
         //
