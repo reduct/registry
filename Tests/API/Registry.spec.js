@@ -129,7 +129,7 @@ describe('@reduct/registry: The "Registry"', function suite () {
         done();
     });
 
-    it('should should complain if a requested item cannot be found', function test (done) {
+    it('should complain if a requested item cannot be found', function test (done) {
         var registry = new Registry();
 
         expect(function callGetWithoutHavingRegisteredTheRequestedItem () {
@@ -139,7 +139,7 @@ describe('@reduct/registry: The "Registry"', function suite () {
         done();
     });
 
-    it('should should retrieve multiple objects at once synchronously', function test (done) {
+    it('should retrieve multiple objects at once synchronously', function test (done) {
         var registry = new Registry();
 
         registry.registerAll({
@@ -157,7 +157,7 @@ describe('@reduct/registry: The "Registry"', function suite () {
         done();
     });
 
-    it('should should inform listeners as soon as a requested item is registered', function test (done) {
+    it('should inform listeners as soon as a requested item is registered', function test (done) {
         var registry = new Registry();
         var afterSomeKeyHasBeenRegistered = chai.spy();
 
@@ -173,7 +173,7 @@ describe('@reduct/registry: The "Registry"', function suite () {
         registry.register('someValue', 'someKey');
     });
 
-    it('should should inform listeners as soon as a requested item is registered within a given timeframe', function test (done) {
+    it('should inform listeners as soon as a requested item is registered within a given timeframe', function test (done) {
         var registry = new Registry();
         var afterSomeKeyHasBeenRegistered = chai.spy();
         var afterTimeoutOccurred = chai.spy();
@@ -198,5 +198,46 @@ describe('@reduct/registry: The "Registry"', function suite () {
         }, 21);
     });
 
+    it('should retrieve multiple objects at once asynchronously', function test (done) {
+        var registry = new Registry();
+        var afterAllHaveBeenRegistered = chai.spy();
 
+        registry.awaitAll(['a', 'b', 'c']).then(afterAllHaveBeenRegistered).then(function assert () {
+            expect(afterAllHaveBeenRegistered).to.have.been.called.once;
+            expect(afterAllHaveBeenRegistered).to.have.been.called.with(['aaa', 'bbb', 'ccc']);
+
+            done();
+        });
+
+        registry.registerAll({
+            'a': 'aaa',
+            'b': 'bbb',
+            'c': 'ccc'
+        });
+    });
+
+    it('should retrieve multiple objects at once asynchronously within a given timeframe', function test (done) {
+        var registry = new Registry();
+        var afterAllHaveBeenRegistered = chai.spy();
+        var afterTimeoutOccurred = chai.spy();
+
+        registry.expectAll(['a', 'b'], 22).then(afterAllHaveBeenRegistered).then(function assert () {
+            expect(afterAllHaveBeenRegistered).to.have.been.called.once;
+            expect(afterAllHaveBeenRegistered).to.have.been.called.with(['aaa', 'bbb']);
+
+            expect(afterTimeoutOccurred).to.have.been.called.once;
+            expect(afterTimeoutOccurred).to.have.been.called.with('@reduct/registry Error: Timeout occured while waiting for c.');
+
+            done();
+        });
+
+        registry.expectAll(['c', 'd'], 20).catch(afterTimeoutOccurred);
+
+        setTimeout(function registerValues () {
+            registry.register('aaa', 'a');
+            registry.register('bbb', 'b');
+            registry.register('ccc', 'c');
+            registry.register('ddd', 'd');
+        }, 21);
+    });
 });
