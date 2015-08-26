@@ -16,7 +16,7 @@ const registry = require('@reduct/registry');
 
 This package also supports AMD/RequireJS. Aren't using AMD or CommonJS? Just grab a [release](https://github.com/reduct/registry/releases), include the `Dist/Registry.min.js` and access the registry via the following global:
 ```js
-const registry = window.reductRegistry;
+const registry = window.reduct.registry;
 ```
 
 

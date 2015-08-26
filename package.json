@@ -41,6 +41,6 @@
     "sourceFolder": "Src/",
     "distributionFolder": "Dist/",
     "entryFile": "Registry.js",
-    "globalPackageName": "reductRegistry"
+    "globalPackageName": "reduct.registry"
   }
 }
