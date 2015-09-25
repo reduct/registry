@@ -298,12 +298,15 @@ describe('@reduct/registry: The "Registry"', function suite () {
 
         registry.use('def', function namespacedCallback (namespacedRegistry) {
             namespacedRegistry.register('bbb', 'b');
+
             expect(namespacedRegistry.get('b')).to.equal('bbb');
+
+            expect(registry.get('def/b')).to.equal('bbb');
+            expect(registry.namespace('def').get('b')).to.equal('bbb');
+
+            namespacedRegistry.expect('b').then(function assert (value) {
+                expect(value).to.equal('bbb');
+            }).then(done);
         });
-
-        expect(registry.get('def/b')).to.equal('bbb');
-        expect(registry.namespace('def').get('b')).to.equal('bbb');
-
-        done();
     });
 });
