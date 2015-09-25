@@ -35,7 +35,8 @@
   "homepage": "https://github.com/reduct/registry",
   "devDependencies": {
     "@reduct/build-tools": "^1.5.2",
-    "@reduct/logger": "^1.1.0"
+    "@reduct/logger": "^1.1.0",
+    "babelify": "^6.3.0"
   },
   "reduct": {
     "sourceFolder": "Src/",
