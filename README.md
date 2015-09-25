@@ -57,6 +57,13 @@ Returns: `Promise`
 
 Returns a Promise that will resolve as soon as an item gets registered under the given alias.
 
+#### registry.awaitAll();
+Type: `Function` <br>
+Argument `aliases`: `Array` <br>
+Returns: `Promise`
+
+Returns a Promise that will resolve as soon as all items identified by an array of aliases are getting registered.
+
 #### registry.expect();
 Type: `Function` <br>
 Argument `alias`: `String` <br>
@@ -64,6 +71,14 @@ Argument `timeout`: `Number` <br>
 Returns: `Promise`
 
 Returns a Promise that will resolve as soon as an item gets registered under the given alias. The Promise will be rejected after `timeout` milliseconds, if until then no item got registered.
+
+#### registry.expectAll();
+Type: `Function` <br>
+Argument `aliases`: `Array` <br>
+Argument `timeout`: `Number` <br>
+Returns: `Promise`
+
+Returns a Promise that will resolve as soon as all items identified by an array of aliases are getting registered. The Promise will be rejected after `timeout` milliseconds, if until then no item got registered.
 
 ## Contributing
 In lieu of a formal styleguide, take care to maintain the existing coding style.
