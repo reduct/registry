@@ -70,6 +70,15 @@ describe('@reduct/registry: The "Registry"', function suite () {
         done();
     });
 
+    it('should expose methods for namespace usage', function test (done) {
+        var registry = new Registry();
+
+        expect(registry.namespace).to.be.a('function');
+        expect(registry.use).to.be.a('function');
+
+        done();
+    });
+
     it('should register a function and make it available via its name', function test (done) {
         var registry = new Registry();
         registry.register(aNamedFunction);
@@ -239,5 +248,65 @@ describe('@reduct/registry: The "Registry"', function suite () {
             registry.register('ccc', 'c');
             registry.register('ddd', 'd');
         }, 21);
+    });
+
+    it('should expose a namespaced version of its API', function test (done) {
+        var registry = new Registry();
+        var namespacedRegistry = registry.namespace('abc');
+
+        expect(namespacedRegistry.register).to.be.a('function');
+        expect(namespacedRegistry.registerAll).to.be.a('function');
+        expect(namespacedRegistry.get).to.be.a('function');
+        expect(namespacedRegistry.getAll).to.be.a('function');
+        expect(namespacedRegistry.await).to.be.a('function');
+        expect(namespacedRegistry.awaitAll).to.be.a('function');
+        expect(namespacedRegistry.expect).to.be.a('function');
+        expect(namespacedRegistry.expectAll).to.be.a('function');
+
+        expect(namespacedRegistry.namespace).not.to.be.a('function');
+        expect(namespacedRegistry.use).not.to.be.a('function');
+
+        done();
+    });
+
+    it('should expose a namespaced version of its API in form of a callback parameter', function test (done) {
+        var registry = new Registry();
+
+        registry.use('abc', function namespacedCallback (namespacedRegistry) {
+            expect(namespacedRegistry.register).to.be.a('function');
+            expect(namespacedRegistry.registerAll).to.be.a('function');
+            expect(namespacedRegistry.get).to.be.a('function');
+            expect(namespacedRegistry.getAll).to.be.a('function');
+            expect(namespacedRegistry.await).to.be.a('function');
+            expect(namespacedRegistry.awaitAll).to.be.a('function');
+            expect(namespacedRegistry.expect).to.be.a('function');
+            expect(namespacedRegistry.expectAll).to.be.a('function');
+
+            expect(namespacedRegistry.namespace).not.to.be.a('function');
+            expect(namespacedRegistry.use).not.to.be.a('function');
+
+            done();
+        });
+    });
+
+    it('should register a namespaced version of an item', function test (done) {
+        var registry = new Registry();
+
+        registry.namespace('abc').register('aaa', 'a');
+        expect(registry.get('abc/a')).to.equal('aaa');
+        expect(registry.namespace('abc').get('a')).to.equal('aaa');
+
+        registry.use('def', function namespacedCallback (namespacedRegistry) {
+            namespacedRegistry.register('bbb', 'b');
+
+            expect(namespacedRegistry.get('b')).to.equal('bbb');
+
+            expect(registry.get('def/b')).to.equal('bbb');
+            expect(registry.namespace('def').get('b')).to.equal('bbb');
+
+            namespacedRegistry.expect('b').then(function assert (value) {
+                expect(value).to.equal('bbb');
+            }).then(done);
+        });
     });
 });

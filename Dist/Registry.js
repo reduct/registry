@@ -105,11 +105,13 @@ var Registry = (function () {
     _createClass(Registry, [{
         key: 'get',
         value: function get(key) {
-            if (!(key in this.items)) {
+            var namespace = arguments.length <= 1 || arguments[1] === undefined ? '' : arguments[1];
+
+            if (!(namespace + key in this.items)) {
                 registryLogger.error('Could not find ' + key + '.');
             }
 
-            return this.items[key];
+            return this.items[namespace + key];
         }
 
         /**
@@ -123,10 +125,12 @@ var Registry = (function () {
         value: function getAll(keys) {
             var _this = this;
 
+            var namespace = arguments.length <= 1 || arguments[1] === undefined ? '' : arguments[1];
+
             var result = [];
 
             keys.forEach(function (key) {
-                return result.push(_this.get(key));
+                return result.push(_this.get(key, namespace));
             });
 
             return result;
@@ -147,13 +151,14 @@ var Registry = (function () {
             var _this2 = this;
 
             var timeout = arguments.length <= 1 || arguments[1] === undefined ? 1000 : arguments[1];
+            var namespace = arguments.length <= 2 || arguments[2] === undefined ? '' : arguments[2];
 
             return new Promise(function (resolve, reject) {
-                if (key in _this2.items) {
-                    resolve(_this2.items[key]);
+                if (namespace + key in _this2.items) {
+                    resolve(_this2.items[namespace + key]);
                 }
 
-                _this2.deferred[key] = resolve;
+                _this2.deferred[namespace + key] = resolve;
 
                 if (timeout > 0) {
                     setTimeout(function () {
@@ -178,9 +183,10 @@ var Registry = (function () {
             var _this3 = this;
 
             var timeout = arguments.length <= 1 || arguments[1] === undefined ? 1000 : arguments[1];
+            var namespace = arguments.length <= 2 || arguments[2] === undefined ? '' : arguments[2];
 
             return Promise.all(keys.map(function (key) {
-                return _this3.expect(key, timeout);
+                return _this3.expect(key, timeout, namespace);
             }));
         }
 
@@ -194,7 +200,9 @@ var Registry = (function () {
     }, {
         key: 'await',
         value: function await(key) {
-            return this.expect(key, 0);
+            var namespace = arguments.length <= 1 || arguments[1] === undefined ? '' : arguments[1];
+
+            return this.expect(key, 0, namespace);
         }
 
         /**
@@ -206,11 +214,11 @@ var Registry = (function () {
          */
     }, {
         key: 'awaitAll',
-        value: function awaitAll(keys) {
+        value: function awaitAll(keys, namespace) {
             var _this4 = this;
 
             return Promise.all(keys.map(function (key) {
-                return _this4.await(key);
+                return _this4.await(key, namespace);
             }));
         }
 
@@ -227,16 +235,17 @@ var Registry = (function () {
             var _this5 = this;
 
             var key = arguments.length <= 1 || arguments[1] === undefined ? '' : arguments[1];
+            var namespace = arguments.length <= 2 || arguments[2] === undefined ? '' : arguments[2];
 
             // Handle batch registration
             if (typeof value === 'object' && Object.getPrototypeOf(value) === Object.prototype) {
                 Object.keys(value).forEach(function (key) {
-                    return _this5.register(key, value);
+                    return _this5.register(key, value, namespace);
                 });
                 return;
             }
 
-            key = key || _guessNameOf(value);
+            key = namespace + (key || _guessNameOf(value));
 
             this.items[key] = value;
 
@@ -259,8 +268,10 @@ var Registry = (function () {
         value: function registerAll(itemMap) {
             var _this6 = this;
 
+            var namespace = arguments.length <= 1 || arguments[1] === undefined ? '' : arguments[1];
+
             Object.keys(itemMap).forEach(function (name) {
-                return _this6.register(itemMap[name], name);
+                return _this6.register(itemMap[name], name, namespace);
             });
 
             return this;
@@ -276,35 +287,56 @@ var registry = function registry() {
     //
     // Shard the actual front-facing API (for not leaking private methods and properties).
     //
-    var api = {
-        register: function register(value) {
-            var key = arguments.length <= 1 || arguments[1] === undefined ? '' : arguments[1];
-            return registry.register(value, key);
-        },
-        registerAll: function registerAll(itemMap) {
-            return registry.registerAll(itemMap);
-        },
-        get: function get(key) {
-            return registry.get(key);
-        },
-        getAll: function getAll(keys) {
-            return registry.getAll(keys);
-        },
-        expect: function expect(key) {
-            var timeout = arguments.length <= 1 || arguments[1] === undefined ? 1000 : arguments[1];
-            return registry.expect(key, timeout);
-        },
-        expectAll: function expectAll(keys) {
-            var timeout = arguments.length <= 1 || arguments[1] === undefined ? 1000 : arguments[1];
-            return registry.expectAll(keys, timeout);
-        },
-        await: function await(key) {
-            return registry.await(key);
-        },
-        awaitAll: function awaitAll(keys) {
-            return registry.awaitAll(keys);
+    var apiFactory = function apiFactory() {
+        var namespace = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
+
+        if (namespace && !namespace.endsWith('/')) {
+            namespace = namespace + '/';
         }
+
+        var namespacedApi = {
+            register: function register(value) {
+                var key = arguments.length <= 1 || arguments[1] === undefined ? '' : arguments[1];
+                return registry.register(value, key, namespace);
+            },
+            registerAll: function registerAll(itemMap) {
+                return registry.registerAll(itemMap, namespace);
+            },
+            get: function get(key) {
+                return registry.get(key, namespace);
+            },
+            getAll: function getAll(keys) {
+                return registry.getAll(keys, namespace);
+            },
+            expect: function expect(key) {
+                var timeout = arguments.length <= 1 || arguments[1] === undefined ? 1000 : arguments[1];
+                return registry.expect(key, timeout, namespace);
+            },
+            expectAll: function expectAll(keys) {
+                var timeout = arguments.length <= 1 || arguments[1] === undefined ? 1000 : arguments[1];
+                return registry.expectAll(keys, timeout, namespace);
+            },
+            await: function await(key) {
+                return registry.await(key, namespace);
+            },
+            awaitAll: function awaitAll(keys) {
+                return registry.awaitAll(keys, namespace);
+            }
+        };
+
+        if (!namespace) {
+            namespacedApi.namespace = function (namespace) {
+                return apiFactory(namespace);
+            };
+            namespacedApi.use = function (namespace, callback) {
+                return callback(apiFactory(namespace));
+            };
+        }
+
+        return namespacedApi;
     };
+
+    var api = apiFactory();
 
     //
     // Expose additional attributes for the tests.

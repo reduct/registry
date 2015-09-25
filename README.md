@@ -80,6 +80,21 @@ Returns: `Promise`
 
 Returns a Promise that will resolve as soon as all items identified by an array of aliases are getting registered. The Promise will be rejected after `timeout` milliseconds, if until then no item got registered.
 
+#### registry.namespace();
+Type: `Function` <br>
+Argument: `namespace`: `String` <br>
+Returns: `Object`
+
+Returns a namespaced version of the registry API. All items will be registered and retrieved with `namespace` automatically prefixed to their identifiers. A trailing slash is automatically added to `namespace`.
+
+#### registry.use();
+Type: `Function` <br>
+Argument: `namespace`: `String` <br>
+Argument: `callback`: `Function` <br>
+Returns: `Object`
+
+Calls `callback` with a namespaced version of the registry API as its first argument. All items will be registered and retrieved with `namespace` automatically prefixed to their identifiers. A trailing slash is automatically added to `namespace`.
+
 ## Contributing
 In lieu of a formal styleguide, take care to maintain the existing coding style.
 
