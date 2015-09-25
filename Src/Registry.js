@@ -46,12 +46,12 @@ class Registry {
      * @param {String} key
      * @returns {}
      */
-    get(key) {
-        if (!(key in this.items)) {
+    get(key, namespace = '') {
+        if (!((namespace + key) in this.items)) {
             registryLogger.error(`Could not find ${key}.`);
         }
 
-        return this.items[key];
+        return this.items[namespace + key];
     }
 
     /**
@@ -60,10 +60,10 @@ class Registry {
      * @param {String...} keys
      * @returns []
      */
-    getAll(keys) {
+    getAll(keys, namespace = '') {
         let result = [];
 
-        keys.forEach((key) => result.push(this.get(key)));
+        keys.forEach((key) => result.push(this.get(key, namespace)));
 
         return result;
     }
@@ -77,13 +77,13 @@ class Registry {
      * @param {Number} timeout
      * @returns {Promise}
      */
-    expect(key, timeout = 1000) {
+    expect(key, timeout = 1000, namespace = '') {
         return new Promise((resolve, reject) => {
-            if (key in this.items) {
-                resolve(this.items[key]);
+            if ((namespace + key) in this.items) {
+                resolve(this.items[namespace + key]);
             }
 
-            this.deferred[key] = resolve;
+            this.deferred[namespace + key] = resolve;
 
             if (timeout > 0) {
                 setTimeout(() => reject(`@reduct/registry Error: Timeout occured while waiting for ${key}.`), timeout);
@@ -100,8 +100,8 @@ class Registry {
      * @param {Number} timeout
      * @returns {Promise}
      */
-    expectAll(keys, timeout = 1000) {
-        return Promise.all(keys.map((key) => this.expect(key, timeout)));
+    expectAll(keys, timeout = 1000, namespace = '') {
+        return Promise.all(keys.map((key) => this.expect(key, timeout, namespace)));
     }
 
     /**
@@ -111,8 +111,8 @@ class Registry {
      * @param {String} key
      * @returns {Promise}
      */
-    await(key) {
-        return this.expect(key, 0);
+    await(key, namespace = '') {
+        return this.expect(key, 0, namespace);
     }
 
     /**
@@ -122,8 +122,8 @@ class Registry {
      * @param {String[]} keys
      * @returns {Promise}
      */
-    awaitAll(keys) {
-        return Promise.all(keys.map((key) => this.await(key)));
+    awaitAll(keys, namespace) {
+        return Promise.all(keys.map((key) => this.await(key, namespace)));
     }
 
     /**
@@ -133,14 +133,14 @@ class Registry {
      * @param {String} key
      * @returns {Registry}
      */
-    register(value, key = '') {
+    register(value, key = '', namespace = '') {
         // Handle batch registration
         if (typeof value === 'object' && Object.getPrototypeOf(value) === Object.prototype) {
-            Object.keys(value).forEach((key) => this.register(key, value));
+            Object.keys(value).forEach((key) => this.register(key, value, namespace));
             return;
         }
 
-        key = key || _guessNameOf(value);
+        key = namespace + (key || _guessNameOf(value));
 
         this.items[key] = value;
 
@@ -158,8 +158,8 @@ class Registry {
      *
      * @param {Object} itemMap
      */
-    registerAll(itemMap) {
-        Object.keys(itemMap).forEach((name) => this.register(itemMap[name], name));
+    registerAll(itemMap, namespace = '') {
+        Object.keys(itemMap).forEach((name) => this.register(itemMap[name], name, namespace));
 
         return this;
     }
@@ -175,16 +175,31 @@ let registry = () => {
     //
     // Shard the actual front-facing API (for not leaking private methods and properties).
     //
-    let api = {
-        register: (value, key = '') => registry.register(value, key),
-        registerAll: (itemMap) => registry.registerAll(itemMap),
-        get: (key) => registry.get(key),
-        getAll: (keys) => registry.getAll(keys),
-        expect: (key, timeout = 1000) => registry.expect(key, timeout),
-        expectAll: (keys, timeout = 1000) => registry.expectAll(keys, timeout),
-        await: (key) => registry.await(key),
-        awaitAll: (keys) => registry.awaitAll(keys)
+    let apiFactory = (namespace = '') => {
+        if (namespace && !namespace.endsWith('/')) {
+            namespace = namespace + '/';
+        }
+
+        let namespacedApi = {
+            register: (value, key = '') => registry.register(value, key, namespace),
+            registerAll: (itemMap) => registry.registerAll(itemMap, namespace),
+            get: (key) => registry.get(key, namespace),
+            getAll: (keys) => registry.getAll(keys, namespace),
+            expect: (key, timeout = 1000) => registry.expect(key, timeout, namespace),
+            expectAll: (keys, timeout = 1000) => registry.expectAll(keys, timeout, namespace),
+            await: (key) => registry.await(key, namespace),
+            awaitAll: (keys) => registry.awaitAll(keys, namespace)
+        };
+
+        if (!namespace) {
+            namespacedApi.namespace = (namespace) => apiFactory(namespace);
+            namespacedApi.use = (namespace, callback) => callback(apiFactory(namespace));
+        }
+
+        return namespacedApi;
     };
+
+    let api = apiFactory();
 
     //
     // Expose additional attributes for the tests.
