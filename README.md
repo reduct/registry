@@ -1,5 +1,7 @@
 # @reduct/registry
 
+[![Build Status](https://travis-ci.org/reduct/registry.svg)](https://travis-ci.org/reduct/registry) [![Dependency Status](https://david-dm.org/reduct/registry.svg)](https://david-dm.org/reduct/registry) [![devDependency Status](https://david-dm.org/reduct/registry/dev-status.svg)](https://david-dm.org/reduct/registry#info=devDependencies) [![Code Climate](https://codeclimate.com/github/reduct/registry/badges/gpa.svg)](https://codeclimate.com/github/reduct/registry) [![Test Coverage](https://codeclimate.com/github/reduct/registry/badges/coverage.svg)](https://codeclimate.com/github/reduct/registry/coverage)
+
 > Defines a set of objects and exposes methods to operate on that
 
 
