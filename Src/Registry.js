@@ -218,6 +218,8 @@ let registry = () => {
 //
 // Add the version information to the factory function.
 //
-registry.version = reductOpts.packageVersion;
+registry.version = 'undefined' === typeof reductOpts
+	? ''
+	: reductOpts.packageVersion;
 
 export default registry;

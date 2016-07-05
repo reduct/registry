@@ -2,7 +2,7 @@
   "name": "@reduct/registry",
   "version": "1.0.1",
   "description": "Defines a set of objects and exposes methods to operate on that ",
-  "main": "Dist/Registry.js",
+  "main": "index.js",
   "scripts": {
     "test": "reduct",
     "reduct": "reduct"
