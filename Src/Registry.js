@@ -204,7 +204,8 @@ let registry = () => {
     //
     // Expose additional attributes for the tests.
     //
-    if (reductOpts.isTestingEnv) {
+	if ('undefined' !== typeof reductOpts &&
+		reductOpts.isTestingEnv) {
         api.items = registry.items;
         api.deferred = registry.deferred;
 
@@ -218,6 +219,8 @@ let registry = () => {
 //
 // Add the version information to the factory function.
 //
-registry.version = reductOpts.packageVersion;
+registry.version = 'undefined' === typeof reductOpts
+	? ''
+	: reductOpts.packageVersion;
 
 export default registry;
